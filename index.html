@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SemLT3D: Semantic-Guided Expert Distillation for Camera-only Long-Tailed 3D Object Detection</title>
+  <meta name="description" content="SemLT3D: Semantic-Guided Expert Distillation for Camera-only Long-Tailed 3D Object Detection. Accepted to CVPR 2026.">
+
+  <!-- Bulma CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro">
+
+  <!-- MathJax for inline math -->
+  <script>
+    MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      color: #1a1a1a;
+    }
+    .title, .subtitle, .publication-title, .publication-authors, .section-title {
+      font-family: 'Google Sans', sans-serif;
+    }
+    .hero {
+      padding: 4rem 1.5rem 2.5rem 1.5rem;
+      background: linear-gradient(180deg, #f7f9fc 0%, #ffffff 100%);
+      border-bottom: 1px solid #eee;
+    }
+    .publication-title {
+      font-weight: 700;
+      font-size: 2.1rem;
+      line-height: 1.25;
+      margin-bottom: 1.25rem;
+    }
+    .publication-authors {
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+    }
+    .publication-authors sup {
+      color: #2c5aa0;
+      font-weight: 600;
+    }
+    .author-affiliations {
+      color: #555;
+      font-size: 0.98rem;
+      margin-bottom: 0.6rem;
+    }
+    .conference-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      margin-top: 0.8rem;
+      border-radius: 999px;
+      background: #fff3cd;
+      color: #856404;
+      font-weight: 600;
+      font-size: 1rem;
+      border: 1px solid #ffeeba;
+    }
+    .button-links {
+      margin-top: 1.5rem;
+    }
+    .button-links .button {
+      margin: 0.3rem;
+      background: #1f1f1f;
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      font-weight: 500;
+    }
+    .button-links .button:hover {
+      background: #444;
+      color: white;
+    }
+    .section-title {
+      font-weight: 700;
+      font-size: 1.7rem;
+      margin-bottom: 1.2rem;
+      border-bottom: 2px solid #2c5aa0;
+      display: inline-block;
+      padding-bottom: 0.3rem;
+    }
+    .content p {
+      font-size: 1.05rem;
+      line-height: 1.65;
+      text-align: justify;
+    }
+    .highlights ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .highlights li {
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 0.55rem;
+      background: #f6f9ff;
+      border-left: 4px solid #2c5aa0;
+      border-radius: 4px;
+      font-size: 1.04rem;
+    }
+    figure {
+      margin: 0;
+      text-align: center;
+    }
+    figure img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    figcaption {
+      margin-top: 0.7rem;
+      font-size: 0.92rem;
+      color: #555;
+      text-align: justify;
+      line-height: 1.5;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .results-table {
+      font-size: 0.86rem;
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.5rem auto;
+    }
+    .results-table th, .results-table td {
+      padding: 0.45rem 0.55rem;
+      border: 1px solid #e1e4e8;
+      text-align: center;
+    }
+    .results-table thead th {
+      background: #2c5aa0;
+      color: white;
+      font-weight: 600;
+      border-color: #2c5aa0;
+    }
+    .results-table tbody tr.ours {
+      background: #fff8e1;
+      font-weight: 600;
+    }
+    .results-table tbody tr.baseline {
+      background: #f1f3f5;
+    }
+    .results-table .method-name {
+      text-align: left;
+    }
+    .table-caption {
+      font-size: 0.95rem;
+      color: #444;
+      margin-bottom: 0.6rem;
+      text-align: center;
+      font-style: italic;
+    }
+    .table-scroll {
+      overflow-x: auto;
+    }
+    .bibtex-box {
+      background: #f4f6f8;
+      border: 1px solid #e1e4e8;
+      border-radius: 6px;
+      padding: 1rem 1.3rem;
+      font-family: 'Menlo', 'Courier New', monospace;
+      font-size: 0.92rem;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    footer {
+      padding: 1.8rem 1rem;
+      text-align: center;
+      color: #888;
+      font-size: 0.9rem;
+      border-top: 1px solid #eee;
+      margin-top: 3rem;
+    }
+    .section {
+      padding: 3rem 1.5rem;
+    }
+    .container.is-max-desktop {
+      max-width: 1100px;
+    }
+    sup {
+      font-size: 0.7em;
+    }
+    .small-note {
+      font-size: 0.85rem;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container is-max-desktop has-text-centered">
+      <h1 class="publication-title">
+        SemLT3D: Semantic-Guided Expert Distillation for<br>
+        Camera-only Long-Tailed 3D Object Detection
+      </h1>
+
+      <div class="publication-authors">
+        <span>Hao Vo<sup>1</sup>,</span>
+        <span>Khoa Vo<sup>1</sup>,</span>
+        <span>Thinh Phan<sup>1</sup>,</span>
+        <span>Ngo Xuan Cuong<sup>1</sup>,</span>
+        <span>Gianfranco Doretto<sup>2</sup>,</span>
+        <span>Hien Nguyen<sup>3</sup>,</span>
+        <span>Anh Nguyen<sup>4</sup>,</span>
+        <span>Ngan Le<sup>1</sup></span>
+      </div>
+
+      <div class="author-affiliations">
+        <sup>1</sup>AICV Lab, University of Arkansas, USA &nbsp;&nbsp;
+        <sup>2</sup>University of Utah, USA &nbsp;&nbsp;
+        <sup>3</sup>University of Houston, USA &nbsp;&nbsp;
+        <sup>4</sup>University of Liverpool, UK
+      </div>
+
+      <div class="conference-badge">
+        Accepted to CVPR 2026
+      </div>
+
+      <div class="button-links">
+        <a class="button" href="https://arxiv.org/pdf/2604.18476v1">
+          <span class="icon"><i class="ai ai-arxiv"></i></span>
+          <span>&nbsp;arXiv</span>
+        </a>
+        <a class="button" href="#">
+          <span class="icon"><i class="fab fa-github"></i></span>
+          <span>&nbsp;Code</span>
+        </a>
+        <a class="button" href="#">
+          <span class="icon"><i class="far fa-file-pdf"></i></span>
+          <span>&nbsp;Paper</span>
+        </a>
+        <a class="button" href="#bibtex">
+          <span class="icon"><i class="fas fa-quote-left"></i></span>
+          <span>&nbsp;BibTeX</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABSTRACT -->
+  <section class="section" style="background:#fafbfc;">
+    <div class="container is-max-desktop">
+      <h2 class="section-title">Abstract</h2>
+      <div class="content">
+        <p>
+          Camera-only 3D object detection has emerged as a cost-effective and scalable alternative
+          to LiDAR for autonomous driving, yet existing methods primarily prioritize overall
+          performance while overlooking the severe long-tail imbalance inherent in real-world datasets.
+          In practice, many rare but safety-critical categories such as children, strollers, or
+          emergency vehicles are heavily underrepresented, leading to biased learning and degraded
+          performance. This challenge is further exacerbated by pronounced <i>inter-class ambiguity</i>
+          (e.g., visually similar subclasses) and <i>substantial intra-class diversity</i> (e.g., objects
+          varying widely in appearance, scale, pose, or context), which together hinder reliable
+          long-tail recognition. In this work, we introduce <b>SemLT3D</b>, a Semantic-Guided Expert
+          Distillation framework designed to enrich the representation space for underrepresented
+          classes through semantic priors. SemLT3D consists of: (1) a <b>language-guided
+          mixture-of-experts</b> module that routes 3D queries to specialized experts according to
+          their semantic affinity, enabling the model to better disentangle confusing classes and
+          specialize on tail distributions; and (2) a <b>semantic projection distillation</b> pipeline
+          that aligns 3D queries with CLIP-informed 2D semantics, producing more coherent and
+          discriminative features across diverse visual manifestations. Although motivated by
+          long-tail imbalance, the semantically structured learning in SemLT3D also improves robustness
+          under broader appearance variations and challenging corner cases, offering a principled
+          step toward more reliable camera-only 3D perception.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHOD FIGURE -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="section-title">Method</h2>
+      <figure>
+        <img src="static/images/arch_SemLT3D.png" alt="Overall architecture of SemLT3D">
+        <figcaption>
+          Overall architecture of the proposed SemLT3D for multi-view 3D long-tailed object detection.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- EXPERIMENTAL RESULTS -->
+  <section class="section" style="background:#fafbfc;">
+    <div class="container is-max-desktop">
+      <h2 class="section-title">Experimental Results</h2>
+
+      <!-- TABLE 1: nuScenes 18-class -->
+      <h3 style="font-family:'Google Sans',sans-serif; font-weight:700; margin-top:1.5rem;">
+        Results on nuScenes
+      </h3>
+      <p class="table-caption">
+        Performance comparison on the nuScenes validation split with 18 categories.
+        The best score is in <b>bold</b>.
+      </p>
+      <div class="table-scroll">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Backbone</th><th>Method</th>
+              <th>mAP&uarr;</th><th>NDS&uarr;</th>
+              <th>mATE&darr;</th><th>mASE&darr;</th>
+              <th>mAOE&darr;</th><th>mAVE&darr;</th>
+              <th>mAAE&darr;</th><th>FPS&uarr;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td rowspan="8">ResNet-50</td><td class="method-name">BEVDet</td>
+              <td>13.27</td><td>19.46</td><td>0.892</td><td>0.528</td><td>0.814</td><td>0.819</td><td>0.665</td><td>13.30</td></tr>
+            <tr><td class="method-name">BEVDet4D</td>
+              <td>17.98</td><td>26.66</td><td>0.852</td><td>0.456</td><td>0.860</td><td>0.456</td><td>0.610</td><td>13.18</td></tr>
+            <tr><td class="method-name">BEVFormer</td>
+              <td>15.51</td><td>23.25</td><td>0.933</td><td><b>0.320</b></td><td>1.000</td><td>0.682</td><td>0.515</td><td>18.18</td></tr>
+            <tr><td class="method-name">BEVDepth</td>
+              <td>15.43</td><td>22.01</td><td>0.794</td><td>0.464</td><td>0.962</td><td>0.736</td><td>0.615</td><td>10.30</td></tr>
+            <tr><td class="method-name">PETRv2</td>
+              <td>18.13</td><td>27.63</td><td>0.881</td><td>0.324</td><td>0.901</td><td>0.543</td><td>0.495</td><td>14.92</td></tr>
+            <tr><td class="method-name">RayDN</td>
+              <td>27.41</td><td>37.39</td><td>0.686</td><td>0.352</td><td>0.761</td><td>0.357</td><td><b>0.476</b></td><td>31.25</td></tr>
+            <tr><td class="method-name">SparseBEV</td>
+              <td>27.94</td><td>38.74</td><td><b>0.646</b></td><td>0.350</td><td>0.719</td><td>0.278</td><td>0.531</td><td>20.80</td></tr>
+            <tr class="baseline"><td class="method-name">StreamPETR (baseline)</td>
+              <td>26.97</td><td>38.19</td><td>0.655</td><td>0.360</td><td>0.684</td><td>0.296</td><td>0.535</td><td><b>32.36</b></td></tr>
+            <tr class="ours"><td>ResNet-50</td><td class="method-name">SemLT3D (Ours)</td>
+              <td><b>29.59</b></td><td><b>40.94</b></td><td>0.694</td><td>0.334</td><td><b>0.615</b></td><td><b>0.252</b></td><td>0.491</td><td>29.40</td></tr>
+
+            <tr><td rowspan="2">ResNet-101</td><td class="method-name">BEVFormer</td>
+              <td>24.65</td><td>37.05</td><td>0.773</td><td>0.323</td><td>0.605</td><td>0.346</td><td>0.481</td><td>5.01</td></tr>
+            <tr><td class="method-name">SparseBEV</td>
+              <td>29.78</td><td>34.87</td><td><b>0.613</b></td><td>0.608</td><td>1.623</td><td>0.280</td><td>0.502</td><td>9.21</td></tr>
+            <tr class="baseline"><td>ResNet-101</td><td class="method-name">StreamPETR (baseline)</td>
+              <td>30.16</td><td>41.17</td><td>0.686</td><td>0.321</td><td>0.634</td><td><b>0.261</b></td><td>0.489</td><td><b>11.76</b></td></tr>
+            <tr class="ours"><td>ResNet-101</td><td class="method-name">SemLT3D (Ours)</td>
+              <td><b>31.12</b></td><td><b>42.79</b></td><td>0.648</td><td><b>0.302</b></td><td><b>0.593</b></td><td>0.267</td><td><b>0.468</b></td><td>10.80</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TABLE 2: AV2 -->
+      <h3 style="font-family:'Google Sans',sans-serif; font-weight:700; margin-top:2rem;">
+        Results on Argoverse 2
+      </h3>
+      <p class="table-caption">
+        Comparisons on the Argoverse 2 validation split. <sup>&dagger;</sup> denotes results
+        taken from Far3D.
+      </p>
+      <div class="table-scroll">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Method</th><th>Backbone</th>
+              <th>mAP&uarr;</th><th>CDS&uarr;</th>
+              <th>mATE&darr;</th><th>mASE&darr;</th><th>mAOE&darr;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="method-name">BEVStereo<sup>&dagger;</sup></td><td>VoV-99</td>
+              <td>14.6</td><td>10.4</td><td>0.847</td><td>0.397</td><td>0.901</td></tr>
+            <tr><td class="method-name">SOLOFusion<sup>&dagger;</sup></td><td>VoV-99</td>
+              <td>14.9</td><td>10.6</td><td>0.934</td><td>0.425</td><td>0.779</td></tr>
+            <tr><td class="method-name">PETR<sup>&dagger;</sup></td><td>VoV-99</td>
+              <td>17.6</td><td>12.2</td><td>0.911</td><td>0.339</td><td>0.819</td></tr>
+            <tr><td class="method-name">Sparse4Dv2<sup>&dagger;</sup></td><td>VoV-99</td>
+              <td>18.9</td><td>13.4</td><td>0.832</td><td>0.343</td><td>0.723</td></tr>
+            <tr><td class="method-name">StreamPETR<sup>&dagger;</sup></td><td>VoV-99</td>
+              <td>20.3</td><td>14.6</td><td>0.843</td><td>0.321</td><td>0.650</td></tr>
+            <tr class="baseline"><td class="method-name">Far3D<sup>&dagger;</sup> (baseline)</td><td>VoV-99</td>
+              <td>24.4</td><td>18.1</td><td>0.796</td><td><b>0.304</b></td><td>0.538</td></tr>
+            <tr class="ours"><td class="method-name">SemLT3D (Ours)</td><td>VoV-99</td>
+              <td><b>25.9</b></td><td><b>19.4</b></td><td><b>0.792</b></td><td>0.308</td><td><b>0.480</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TABLE 3: Long-tail break down -->
+      <h3 style="font-family:'Google Sans',sans-serif; font-weight:700; margin-top:2rem;">
+        Long-Tail Breakdown on nuScenes
+      </h3>
+      <p class="table-caption">
+        Long-tail break down mAP evaluation on the nuScenes validation split. L denotes LiDAR,
+        C denotes Camera. <sup>&dagger;</sup>: results taken from FOMO-3D.
+        <sup>*</sup>: method using ViT backbone. Rows in <span style="color:#888;">grey</span>
+        use multi-sensor inputs.
+      </p>
+      <div class="table-scroll">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Method</th><th>Modality</th>
+              <th>All</th><th>Many</th><th>Medium</th><th>Few</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="method-name">CenterPoint<sup>&dagger;</sup></td><td>L</td><td>39.2</td><td>76.4</td><td>43.1</td><td>3.5</td></tr>
+            <tr><td class="method-name">CenterPoint<sup>&dagger;</sup> (w/ hier.)</td><td>L</td><td>40.4</td><td>77.1</td><td>45.1</td><td>4.3</td></tr>
+            <tr><td class="method-name">BEVFusion-L<sup>&dagger;</sup></td><td>L</td><td>42.5</td><td>72.5</td><td>48.0</td><td>10.6</td></tr>
+            <tr style="color:#888;"><td class="method-name">TransFusion<sup>&dagger;</sup></td><td>L+C</td><td>39.8</td><td>73.9</td><td>41.2</td><td>9.8</td></tr>
+            <tr style="color:#888;"><td class="method-name">BEVFusion<sup>&dagger;</sup></td><td>L+C</td><td>45.5</td><td>75.5</td><td>52.0</td><td>12.8</td></tr>
+            <tr style="color:#888;"><td class="method-name">CMT<sup>&dagger;</sup></td><td>L+C</td><td>44.4</td><td>79.9</td><td>53.0</td><td>4.8</td></tr>
+            <tr style="color:#888;"><td class="method-name">MMF<sup>&dagger;</sup></td><td>L+C</td><td>43.6</td><td>77.1</td><td>49.0</td><td>9.4</td></tr>
+            <tr style="color:#888;"><td class="method-name">MMLF<sup>&dagger;</sup></td><td>L+C</td><td>51.4</td><td>77.9</td><td>59.4</td><td>20.0</td></tr>
+            <tr style="color:#888;"><td class="method-name">FOMO-3D<sup>&dagger;</sup></td><td>L+C</td><td>54.6</td><td>79.9</td><td>59.6</td><td>27.6</td></tr>
+            <tr><td class="method-name">BEVDet</td><td>C</td><td>13.27</td><td>27.70</td><td>14.31</td><td>0.00</td></tr>
+            <tr><td class="method-name">BEVFormer</td><td>C</td><td>15.51</td><td>34.60</td><td>14.91</td><td>0.30</td></tr>
+            <tr><td class="method-name">BEVDepth</td><td>C</td><td>15.43</td><td>36.46</td><td>13.51</td><td>0.13</td></tr>
+            <tr><td class="method-name">BEVDet4D</td><td>C</td><td>17.98</td><td>39.34</td><td>18.07</td><td>0.00</td></tr>
+            <tr><td class="method-name">PETRv2</td><td>C</td><td>18.13</td><td>38.82</td><td>14.96</td><td>0.30</td></tr>
+            <tr><td class="method-name">RayDN</td><td>C</td><td>27.41</td><td>54.50</td><td>31.02</td><td>0.60</td></tr>
+            <tr><td class="method-name">SparseBEV</td><td>C</td><td>27.94</td><td>54.18</td><td>29.67</td><td>4.10</td></tr>
+            <tr class="baseline"><td class="method-name">StreamPETR (baseline)</td><td>C</td><td>26.97</td><td>53.32</td><td>28.53</td><td>3.22</td></tr>
+            <tr class="ours"><td class="method-name">SemLT3D (Ours)</td><td>C</td><td>29.59</td><td>50.92</td><td>34.55</td><td>6.03</td></tr>
+            <tr class="ours"><td class="method-name">SemLT3D<sup>*</sup> (Ours, ViT)</td><td>C</td><td><b>41.10</b></td><td><b>62.08</b></td><td><b>40.62</b></td><td><b>20.77</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ACKNOWLEDGMENTS -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="section-title">Acknowledgments</h2>
+      <div class="content">
+        <p>
+          This material is based upon work supported by the National Science Foundation under
+          Award No. #2443877 (NSF CAREER), #1946391 (NSF RII Track-1 DART), and #2445877
+          (NSF E-RISE). We also acknowledge the Arkansas High-Performance Computing Center for
+          providing GPUs.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BIBTEX -->
+  <section class="section" id="bibtex" style="background:#fafbfc;">
+    <div class="container is-max-desktop">
+      <h2 class="section-title">BibTeX</h2>
+      <pre class="bibtex-box">@article{vo2026semlt3d,
+  title={SemLT3D: Semantic-Guided Expert Distillation for Camera-only Long-Tailed 3D Object Detection},
+  author={Vo, Hao and Vo, Khoa and Phan, Thinh and Cuong, Ngo Xuan and Doretto, Gianfranco and Nguyen, Hien and Nguyen, Anh and Le, Ngan},
+  journal={arXiv preprint arXiv:2604.18476},
+  year={2026}
+}</pre>
+    </div>
+  </section>
+
+</body>
+</html>
